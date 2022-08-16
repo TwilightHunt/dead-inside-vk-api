@@ -25,6 +25,7 @@ namespace DeadInsideVkApi
             {
                 string raw = File.ReadAllText(CONFIG_NAME);
                 config = JsonConvert.DeserializeObject<AppConfig>(raw);
+
             } else
             {
                 config = new AppConfig();
