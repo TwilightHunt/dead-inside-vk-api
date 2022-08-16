@@ -36,29 +36,38 @@ namespace DeadInsideVkApi
             }
         }
 
-        void Auth()
+        private void Auth()
         {
             api = new VkApi();
 
             api.Authorize(new ApiAuthParams
             {
-                AccessToken = config.Token
+                AccessToken = config.Token,
             });
         }
 
         private void GetUserInfo()
         {
-            var ids = new long[] { 249764138 };
+            var ids = new long[] { 249764138, 522339419 };
            
-            var user = api.Users.Get(ids).FirstOrDefault();
+            var users = api.Users.Get(ids);
 
-            if(user.FirstName != null)
+            foreach(var u in users)
             {
-                Console.WriteLine($"User name is {user.FirstName}");
-            } else
-            {
-                Console.WriteLine("User name not found");
-            }  
+                if (u.Domain != null)
+                {
+                    Console.WriteLine($"User domain is {u.Domain}");
+                }
+                else
+                {
+                    Console.WriteLine("User name not found");
+                }
+            }
+        }
+
+        private void GetGroups()
+        {
+
         }
 
         public void Bootstrap()
