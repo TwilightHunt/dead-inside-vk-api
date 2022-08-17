@@ -1,22 +1,21 @@
-﻿using DeadInsideVkApi.ConfigTypes;
+﻿using DeadInsideVkApi.Analyser;
+using DeadInsideVkApi.ConfigTypes;
+using DeadInsideVkApi.VK;
 using Newtonsoft.Json;
-using VkNet;
-using VkNet.Enums.Filters;
-using VkNet.Model;
 
 namespace DeadInsideVkApi
 {
     public class DeadInside
     {
-        private AppConfig? config;
-        private VkApi api;
+        private AppConfig config;
+        private VkHandler vkHandler;
 
         const string CONFIG_NAME = "config.json";
 
         public DeadInside()
         {
             LoadConfig();
-            Auth();
+            vkHandler = new VkHandler(config!.Token);
         }
 
         private void LoadConfig()
@@ -24,9 +23,9 @@ namespace DeadInsideVkApi
             if (File.Exists(CONFIG_NAME))
             {
                 string raw = File.ReadAllText(CONFIG_NAME);
-                config = JsonConvert.DeserializeObject<AppConfig>(raw);
-
-            } else
+                config = JsonConvert.DeserializeObject<AppConfig>(raw)!;
+            }
+            else
             {
                 config = new AppConfig();
                 File.WriteAllText(CONFIG_NAME, JsonConvert.SerializeObject(config));
@@ -37,43 +36,10 @@ namespace DeadInsideVkApi
             }
         }
 
-        private void Auth()
-        {
-            api = new VkApi();
-
-            api.Authorize(new ApiAuthParams
-            {
-                AccessToken = config.Token,
-            });
-        }
-
-        private void GetUserInfo()
-        {
-            var ids = new long[] { 249764138, 522339419 };
-           
-            var users = api.Users.Get(ids);
-
-            foreach(var u in users)
-            {
-                if (u.Domain != null)
-                {
-                    Console.WriteLine($"User domain is {u.Domain}");
-                }
-                else
-                {
-                    Console.WriteLine("User name not found");
-                }
-            }
-        }
-
-        private void GetGroups()
-        {
-
-        }
-
         public void Bootstrap()
         {
-            GetUserInfo();
+            var analyser = new AnalyserContext();
+            analyser.Analyse();
         }
     }
 }

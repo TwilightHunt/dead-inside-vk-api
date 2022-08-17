@@ -1,4 +1,5 @@
-﻿using VkNet;
+﻿using System.Collections.ObjectModel;
+using VkNet;
 using VkNet.Model;
 using VkNet.Utils;
 
@@ -23,20 +24,9 @@ namespace DeadInsideVkApi.VK
                 UserId = u_id, Count = count, Offset = offset, Extended = true 
             });
         }
-        public void GetUserInfo()
+        public ReadOnlyCollection<User> GetUsersInfo(long[] id, VkNet.Enums.Filters.ProfileFields filter)
         {
-            var users = api.Users.Get(new long[] { 249764138, 522339419 });
-            foreach (var u in users)
-            {
-                if (u.Domain != null)
-                {
-                    Console.WriteLine($"User domain is {u.Domain}");
-                }
-                else
-                {
-                    Console.WriteLine("User name not found");
-                }
-            }
+            return api.Users.Get(id, filter);
         }
     }
 }
