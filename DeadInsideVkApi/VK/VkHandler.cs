@@ -18,10 +18,10 @@ namespace DeadInsideVkApi.VK
             });
             Instance = this;
         }
-        public VkCollection<Group> GetGroups(long u_id, int count = 10, int offset = 0) 
+        public VkCollection<Group> GetGroups(long u_id, int offset = 0) 
         {
             return api.Groups.Get(new VkNet.Model.RequestParams.GroupsGetParams() {
-                UserId = u_id, Count = count, Offset = offset, Extended = true 
+                UserId = u_id, Offset = offset, Extended = true 
             });
         }
         public ReadOnlyCollection<User> GetUsersInfo(long[] id, VkNet.Enums.Filters.ProfileFields filter)

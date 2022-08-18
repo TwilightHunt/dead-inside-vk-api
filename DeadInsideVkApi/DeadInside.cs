@@ -1,5 +1,6 @@
 ﻿using DeadInsideVkApi.Analyser;
 using DeadInsideVkApi.ConfigTypes;
+using DeadInsideVkApi.System;
 using DeadInsideVkApi.VK;
 using Newtonsoft.Json;
 
@@ -24,6 +25,7 @@ namespace DeadInsideVkApi
             {
                 string raw = File.ReadAllText(CONFIG_NAME);
                 config = JsonConvert.DeserializeObject<AppConfig>(raw)!;
+                Storage.Set(Constants.SYSTEM_CONFIG, config);
             }
             else
             {

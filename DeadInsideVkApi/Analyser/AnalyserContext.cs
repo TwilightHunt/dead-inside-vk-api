@@ -14,9 +14,11 @@ namespace DeadInsideVkApi.Analyser
 
         public void Analyse()
         {
-            // ... | some prepare logic
-            Detector.Detect();
             Console.WriteLine("Detect..");
+
+            float result = Detector.FullDetect(249764138);
+            Console.WriteLine($"User is dead inside for {result}");
+            
         }
 
         public void SwapAnalyser(IDetector new_detector)

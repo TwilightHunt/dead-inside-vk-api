@@ -4,9 +4,9 @@ namespace DeadInsideVkApi.Analyser.Strategies
 {
     internal class SunshineDetector : IDetector
     {
-        public void Detect()
+        public float FullDetect(int uid)
         {
-            throw new NotImplementedException();
+            return 0;
         }
     }
 }
