@@ -1,6 +1,7 @@
 ﻿using DeadInsideVkApi.Analyser.API;
 using DeadInsideVkApi.ConfigTypes;
 using DeadInsideVkApi.System;
+using DeadInsideVkApi.UserInfo;
 using DeadInsideVkApi.VK;
 
 namespace DeadInsideVkApi.Analyser.Strategies
@@ -14,26 +15,32 @@ namespace DeadInsideVkApi.Analyser.Strategies
         {
             var config = Storage.Get<AppConfig>(Constants.SYSTEM_CONFIG);
 
-            if (CheckUserViaBase(config, uid))
+            User user = new User(uid);
+
+            if (CheckUserViaBase(config, user))
             {
-                Console.WriteLine("User was detected in base as dead inside");
-                return 100f;
+                return user.Result;
 
             }
             else
             {
-                CheckUserDomain(config, uid);
-                CheckUserStatus(config, uid);
-                CheckUserGroups(config, uid);
-                return finalScore * 100 / maxScore;
+                CheckUserDomain(config, user);
+                CheckUserStatus(config, user);
+                CheckUserGroups(config, user);
+
+                float result = finalScore * 100 / maxScore;
+                user.Result = result;
+                config.UpdateUserBase(user);
+
+                return result;
             }
         }
 
-        private bool CheckUserViaBase(AppConfig config, int uid)
+        private bool CheckUserViaBase(AppConfig config, User user)
         {
             foreach (var u in config.Users)
             {
-                if (u == uid)
+                if (u.Id == user.Id)
                 {
                     return true;
                 }
@@ -43,56 +50,45 @@ namespace DeadInsideVkApi.Analyser.Strategies
 
         private bool AnalyseUserProperty(AppConfig config, string property)
         {
+            maxScore++;
             foreach (string word in config.Tags)
             {
                 if (property.Contains(word))
                 {
-                    Console.WriteLine($"Forbidden tag '{word}' was found");
+                    Console.WriteLine($"'{property}' - Forbidden tag '{word}' was founded");
                     finalScore++;
                     return true;
-                }
+                } 
             }
+            Console.WriteLine($"'{property}' - Clear!");
             return false;
         }
 
-        private void CheckUserDomain(AppConfig config, int uid)
+        private void CheckUserDomain(AppConfig config, User user)
         {
-            maxScore++;
+            Console.WriteLine("\r\nCheking for user's domain..");
 
-            Console.WriteLine("Cheking for user's domain..");
-
-            string domain = VkHandler.Instance.GetUsersInfo(new long[] { uid },
-                    VkNet.Enums.Filters.ProfileFields.Domain).First().Domain;
-
-            if (!AnalyseUserProperty(config, domain)) { Console.WriteLine("Clear!"); }
+            AnalyseUserProperty(config, user.GetDomain());
         }
 
-        private void CheckUserStatus(AppConfig config, int uid)
+        private void CheckUserStatus(AppConfig config, User user)
         {
-            maxScore++;
+            Console.WriteLine("\r\nCheking for user's status..");
 
-            Console.WriteLine("Cheking for user's status..");
-
-            string status = VkHandler.Instance.GetUsersInfo(new long[] { uid },
-                VkNet.Enums.Filters.ProfileFields.Status).First().Status;
-
-            if (!AnalyseUserProperty(config, status)) { Console.WriteLine("Clear!"); }
+            AnalyseUserProperty(config, user.GetStatus());
         }
 
-        private bool CheckUserGroups(AppConfig config, int uid)
+        private void CheckUserGroups(AppConfig config, User user)
         {
-            maxScore++;
+            Console.WriteLine("\r\nCheking for user's groups..");
 
-            Console.WriteLine("Cheking for user's groups..");
-
-            var groups = VkHandler.Instance.GetGroups(uid);
+            var groups = user.GetGroups();
 
             foreach (var g in groups)
             {
-                if (AnalyseUserProperty(config, g.Name)) return true;
+                AnalyseUserProperty(config, g.Name);
+                    
             }
-            Console.WriteLine("Clear!");
-            return false;
         }
 
     }

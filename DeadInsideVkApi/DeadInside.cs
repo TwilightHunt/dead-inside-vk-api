@@ -9,9 +9,7 @@ namespace DeadInsideVkApi
     public class DeadInside
     {
         private AppConfig config;
-        private VkHandler vkHandler;
-
-        const string CONFIG_NAME = "config.json";
+        private VkHandler vkHandler;       
 
         public DeadInside()
         {
@@ -21,17 +19,17 @@ namespace DeadInsideVkApi
 
         private void LoadConfig()
         {
-            if (File.Exists(CONFIG_NAME))
+            if (File.Exists(Constants.CONFIG_NAME))
             {
-                string raw = File.ReadAllText(CONFIG_NAME);
+                string raw = File.ReadAllText(Constants.CONFIG_NAME);
                 config = JsonConvert.DeserializeObject<AppConfig>(raw)!;
                 Storage.Set(Constants.SYSTEM_CONFIG, config);
             }
             else
             {
                 config = new AppConfig();
-                File.WriteAllText(CONFIG_NAME, JsonConvert.SerializeObject(config));
-                Console.WriteLine($"'{CONFIG_NAME}' was created. Please enter the config.");
+                File.WriteAllText(Constants.CONFIG_NAME, JsonConvert.SerializeObject(config));
+                Console.WriteLine($"'{Constants.CONFIG_NAME}' was created. Please enter the config.");
 
                 Console.ReadKey();
                 Environment.Exit(0);

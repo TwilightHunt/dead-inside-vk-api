@@ -16,8 +16,8 @@ namespace DeadInsideVkApi.Analyser
         {
             Console.WriteLine("Detect..");
 
-            float result = Detector.FullDetect(249764138);
-            Console.WriteLine($"User is dead inside for {result}");
+            float result = Detector.FullDetect(29685071);
+            Console.WriteLine($"User is dead inside for {result}%");
             
         }
 
