@@ -49,7 +49,7 @@ namespace DeadInsideVkApi.Analyser.Strategies
             return false;
         }
 
-        private bool AnalyseUserProperty(AppConfig config, string property)
+        private void AnalyseUserProperty(AppConfig config, string property)
         {
             maxScore++;
             foreach (string word in config.Tags)
@@ -58,11 +58,10 @@ namespace DeadInsideVkApi.Analyser.Strategies
                 {
                     Console.WriteLine($"'{property}' - Forbidden tag '{word}' was founded");
                     finalScore++;
-                    return true;
+                    return ;
                 } 
             }
             Console.WriteLine($"'{property}' - Clear!");
-            return false;
         }
 
         private void CheckUserDomain(AppConfig config, User user)
