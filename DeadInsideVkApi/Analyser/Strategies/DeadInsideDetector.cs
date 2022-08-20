@@ -17,7 +17,7 @@ namespace DeadInsideVkApi.Analyser.Strategies
 
             User user = new User(uid);
 
-            if (CheckUserViaBase(config, user))
+            if (CheckUserViaBase(config, ref user))
             {
                 return user.Result;
 
@@ -36,12 +36,13 @@ namespace DeadInsideVkApi.Analyser.Strategies
             }
         }
 
-        private bool CheckUserViaBase(AppConfig config, User user)
+        private bool CheckUserViaBase(AppConfig config, ref User user)
         {
             foreach (var u in config.Users)
             {
                 if (u.Id == user.Id)
                 {
+                    user = u;
                     return true;
                 }
             }
@@ -86,8 +87,7 @@ namespace DeadInsideVkApi.Analyser.Strategies
 
             foreach (var g in groups)
             {
-                AnalyseUserProperty(config, g.Name);
-                    
+                AnalyseUserProperty(config, g.Name);    
             }
         }
 
