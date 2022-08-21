@@ -49,18 +49,17 @@ namespace DeadInsideVkApi.Analyser.Strategies
             return false;
         }
 
-        private void AnalyseUserProperty(AppConfig config, string property)
+        private int AnalyseUserProperty(AppConfig config, string property)
         {
-            maxScore++;
             foreach (string word in config.Tags)
             {
                 if (property.Contains(word))
                 {
                     Console.WriteLine($"'{property}' - Forbidden tag '{word}' was founded");
-                    finalScore++;
-                    return ;
+                    return 1;
                 } 
             }
+            return 0;
             Console.WriteLine($"'{property}' - Clear!");
         }
 
@@ -68,14 +67,16 @@ namespace DeadInsideVkApi.Analyser.Strategies
         {
             Console.WriteLine("\r\nCheking for user's domain..");
 
-            AnalyseUserProperty(config, user.GetDomain());
+            maxScore++;
+            finalScore += AnalyseUserProperty(config, user.GetDomain());
         }
 
         private void CheckUserStatus(AppConfig config, User user)
         {
             Console.WriteLine("\r\nCheking for user's status..");
 
-            AnalyseUserProperty(config, user.GetStatus());
+            maxScore++;
+            finalScore += AnalyseUserProperty(config, user.GetStatus());
         }
 
         private void CheckUserGroups(AppConfig config, User user)
@@ -83,10 +84,11 @@ namespace DeadInsideVkApi.Analyser.Strategies
             Console.WriteLine("\r\nCheking for user's groups..");
 
             var groups = user.GetGroups();
+            maxScore++;
 
             foreach (var g in groups)
             {
-                AnalyseUserProperty(config, g.Name);    
+                if (finalScore < maxScore) finalScore += AnalyseUserProperty(config, g.Name);    
             }
         }
 

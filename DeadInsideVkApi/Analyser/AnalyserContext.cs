@@ -14,6 +14,7 @@ namespace DeadInsideVkApi.Analyser
 
         public void Analyse()
         {
+            Console.Write("Enter ID: ");
             int id = Convert.ToInt32(Console.ReadLine());
 
             float result = Detector.FullDetect(id);
