@@ -1,95 +1,53 @@
 ﻿using DeadInsideVkApi.Analyser.API;
 using DeadInsideVkApi.ConfigTypes;
+using DeadInsideVkApi.Extensions;
+using DeadInsideVkApi.Handlers;
 using DeadInsideVkApi.System;
-using DeadInsideVkApi.UserInfo;
-using DeadInsideVkApi.VK;
+using VkNet.Enums.Filters;
+using VkNet.Model;
 
 namespace DeadInsideVkApi.Analyser.Strategies
 {
     internal class DeadInsideDetector : IDetector
     {
-        int maxScore = 0;
-        int finalScore = 0;
+        private readonly VkHandler _handler;
+        private readonly AppConfig _appConfig;
+        const int MAX_SCORE = 3;
 
-        public float FullDetect(int uid)
+        public DeadInsideDetector()
         {
-            var config = Storage.Get<AppConfig>(Constants.SYSTEM_CONFIG);
-
-            User user = new User(uid);
-
-            if (CheckUserViaBase(config, ref user))
-            {
-                return user.Result;
-
-            }
-            else
-            {
-                CheckUserDomain(config, user);
-                CheckUserStatus(config, user);
-                CheckUserGroups(config, user);
-
-                float result = finalScore * 100 / maxScore;
-                user.Result = result;
-                config.UpdateUserBase(user);
-
-                return result;
-            }
+            _appConfig = Storage.Get<AppConfig>()!;
+            _handler = Storage.Get<VkHandler>()!;
         }
 
-        private bool CheckUserViaBase(AppConfig config, ref User user)
+        public float FullDetect(long uid)
         {
-            foreach (var u in config.Users)
-            {
-                if (u.Id == user.Id)
-                {
-                    user = u;
-                    return true;
-                }
-            }
-            return false;
+            var user = _handler.UserHandler.GetUser(uid);
+
+            int finalScore = CheckProperty(user.Domain, "domain") + CheckProperty(user.Status, "status") + CheckUserGroups(user);
+
+            return finalScore * 100 / MAX_SCORE;
         }
 
-        private int AnalyseUserProperty(AppConfig config, string property)
+        private int CheckProperty(string property)
         {
-            foreach (string word in config.Tags)
-            {
-                if (property.Contains(word))
-                {
-                    Console.WriteLine($"'{property}' - Forbidden tag '{word}' was founded");
-                    return 1;
-                } 
-            }
-            return 0;
-            Console.WriteLine($"'{property}' - Clear!");
+            var exist = _appConfig.Tags.Any(word => property.Contains(word));
+            return exist ? 1 : 0;
         }
 
-        private void CheckUserDomain(AppConfig config, User user)
+        private int CheckProperty(string property, string property_name)
         {
-            Console.WriteLine("\r\nCheking for user's domain..");
-
-            maxScore++;
-            finalScore += AnalyseUserProperty(config, user.GetDomain());
+            Console.WriteLine($"\r\nChecking for user's {property_name}..");
+            return CheckProperty(property);
         }
 
-        private void CheckUserStatus(AppConfig config, User user)
+        private int CheckUserGroups(User user)
         {
-            Console.WriteLine("\r\nCheking for user's status..");
-
-            maxScore++;
-            finalScore += AnalyseUserProperty(config, user.GetStatus());
-        }
-
-        private void CheckUserGroups(AppConfig config, User user)
-        {
-            Console.WriteLine("\r\nCheking for user's groups..");
-
-            var groups = user.GetGroups();
-            maxScore++;
-
-            foreach (var g in groups)
-            {
-                if (finalScore < maxScore) finalScore += AnalyseUserProperty(config, g.Name);    
-            }
+            Console.WriteLine("\r\nChecking for user's groups..");
+            var groups = user?.GetAllUserGroups(GroupsFilters.Publics).SelectMany(t => t);
+            var score = groups?.Select(group => CheckProperty(group.Name)).Sum() ?? 0;
+            Console.WriteLine();
+            return score > MAX_SCORE ? MAX_SCORE : score;
         }
 
     }

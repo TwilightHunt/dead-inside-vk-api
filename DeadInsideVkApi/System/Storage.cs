@@ -6,8 +6,23 @@
 
         public static T? Get<T>(string key)
         {
-            if (Exist(key)) return (T)_storage[key];
+            if (_storage.TryGetValue(key, out var value)) return (T)value;
             return default;
+        }
+
+        public static T? Get<T>()
+        {
+            return (T?)_storage.Values.FirstOrDefault(v =>
+                v.GetType().Equals(typeof(T))
+            );
+            //foreach(var value in _storage.Values)
+            //{
+            //    if(value.GetType() == typeof(T))
+            //    {
+            //        return (T?)value;
+            //    }
+            //}
+            //return default;
         }
 
         public static void Set(string key, object value)
@@ -19,6 +34,5 @@
         {
             return _storage.ContainsKey(key);
         }
-
     }
 }

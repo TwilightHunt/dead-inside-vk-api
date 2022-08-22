@@ -2,6 +2,6 @@
 {
     internal interface IDetector
     {
-        float FullDetect(int uid);
+        float FullDetect(long uid);
     }
 }

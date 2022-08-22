@@ -1,7 +1,7 @@
 ﻿using DeadInsideVkApi.Analyser;
 using DeadInsideVkApi.ConfigTypes;
+using DeadInsideVkApi.Handlers;
 using DeadInsideVkApi.System;
-using DeadInsideVkApi.VK;
 using Newtonsoft.Json;
 
 namespace DeadInsideVkApi
@@ -9,12 +9,13 @@ namespace DeadInsideVkApi
     public class DeadInside
     {
         private AppConfig config;
-        private VkHandler vkHandler;       
 
         public DeadInside()
         {
             LoadConfig();
-            vkHandler = new VkHandler(config!.Token);
+            Storage.Set("VK_HANDLER", new VkHandler(config!.Token));
+            // Load Cache Method
+            // Storage Set Cache Storage
         }
 
         private void LoadConfig()

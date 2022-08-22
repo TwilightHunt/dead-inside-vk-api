@@ -1,4 +1,7 @@
-﻿namespace DeadInsideVkApi.CLI
+﻿using DeadInsideVkApi.Handlers;
+using DeadInsideVkApi.System;
+
+namespace DeadInsideVkApi.CLI
 {
     class App
     {

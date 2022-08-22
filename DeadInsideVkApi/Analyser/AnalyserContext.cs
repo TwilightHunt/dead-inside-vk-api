@@ -15,7 +15,7 @@ namespace DeadInsideVkApi.Analyser
         public void Analyse()
         {
             Console.Write("Enter ID: ");
-            int id = Convert.ToInt32(Console.ReadLine());
+            long id = Convert.ToInt64(Console.ReadLine());
 
             float result = Detector.FullDetect(id);
             Console.WriteLine($"User is dead inside for {result}%");         
