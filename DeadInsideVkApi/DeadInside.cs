@@ -14,8 +14,9 @@ namespace DeadInsideVkApi
         {
             LoadConfig();
             Storage.Set("VK_HANDLER", new VkHandler(config!.Token));
-            // Load Cache Method
-            // Storage Set Cache Storage
+            Storage.Set("CACHE", StorageCache.ReadFromJson());
+            //cache.Set("id", new long[] { 123, 456 });
+            //cache.SaveToJson();
         }
 
         private void LoadConfig()
